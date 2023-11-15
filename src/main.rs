@@ -44,11 +44,10 @@ use std::io::{self, BufRead, Error, Read, Write};
 // copy_line_with_text(input_file, output_file, text_to_find)
 // }
 fn create_template(contract_name: Option<&str>) -> Result<(), io::Error> {
-    let instance_buffer;
-    match contract_name {
-        Some(str) => instance_buffer = File::create(str.to_owned() + ".sol"),
-        None => instance_buffer = File::create("instance.sol"),
-    }
+    let instance_buffer = match contract_name {
+        Some(str) => File::create(str.to_owned() + ".sol"),
+        None => File::create("instance.sol"),
+    };
     let f = File::open("outputs/template.sol");
     let mut template_buffer = String::new();
     f?.read_to_string(&mut template_buffer)?;
@@ -77,7 +76,7 @@ fn extract_line(function_names: Vec<&str>, filename: &str) -> Result<Vec<String>
     for line in reader.lines() {
         let line = line?;
         for function_name in &function_names {
-            if line.contains(format!("function {}",function_name).as_str()) {
+            if line.contains(format!("function {}", function_name).as_str()) {
                 extracts.push(line.clone().trim().to_string());
             }
         }
