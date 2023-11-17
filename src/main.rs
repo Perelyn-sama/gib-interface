@@ -82,7 +82,25 @@ fn extract_line(function_names: Vec<&str>, filename: &str) -> Result<Vec<String>
         }
     }
 
-    Ok(extracts)
+    Ok(format_extract(extracts))
+}
+
+fn format_extract(extracts: Vec<String>) -> Vec<String> {
+    let mut formatted_extracts = Vec::new();
+    for mut extract in extracts {
+        if extract.ends_with("{") {
+            extract.remove(extract.len() - 1);
+        } 
+        // if extract.find("override").is_some(){
+        //     extract.remma
+        // }
+        // let string: String = "function tokenURI(IERC721Metadata sablier, uint256 streamId) external view override returns (string memory uri);".to_string();
+        // dbg!(string.split(" ").filter(|x| *x != "override").collect::<String>());
+        let mut extract = extract.trim().to_string();
+        extract.push(";".parse().unwrap());
+        formatted_extracts.push(extract);
+    }
+    formatted_extracts
 }
 
 fn main() {
@@ -96,9 +114,10 @@ fn main() {
     ];
     let extracts = extract_line(function_names, "SablierV2NFTDescriptor.sol");
     dbg!(extracts.unwrap());
+    // dbg!(format_extract(extracts.unwrap()));
 }
 // I want to be able to copy the content of the template - done
 // change ITemplate to the contract_name - done
 // extract line of function name - done
-// remove space at the beginning of the extract
-// make
+// remove space at the beginning of the extract - done
+// fornmat extracts
