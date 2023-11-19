@@ -85,22 +85,59 @@ fn extract_line(function_names: Vec<&str>, filename: &str) -> Result<Vec<String>
     Ok(format_extract(extracts))
 }
 
+fn remove_word(mut sentence: String, word: &str) -> String {
+    let index = match sentence.find(word) {
+        Some(usize) => usize,
+        None => return sentence
+    };
+    let word_length = word.len();
+    for _i in 0..=word_length {
+        sentence.remove(index);
+    }
+    sentence
+}
+
+#[test]
+fn test_remove_word(){
+    let test_string = "function tokenURI(IERC721Metadata sablier, uint256 streamId) external view override returns (string memory uri);".to_string();
+    let expected_result = "function tokenURI(IERC721Metadata sablier, uint256 streamId) external view returns (string memory uri);".to_string();
+    let result = remove_word(test_string, "override");
+
+    assert_eq!(expected_result, result);
+}
+
 fn format_extract(extracts: Vec<String>) -> Vec<String> {
     let mut formatted_extracts = Vec::new();
     for mut extract in extracts {
         if extract.ends_with("{") {
             extract.remove(extract.len() - 1);
-        } 
-        // if extract.find("override").is_some(){
-        //     extract.remma
-        // }
-        // let string: String = "function tokenURI(IERC721Metadata sablier, uint256 streamId) external view override returns (string memory uri);".to_string();
-        // dbg!(string.split(" ").filter(|x| *x != "override").collect::<String>());
+        }
         let mut extract = extract.trim().to_string();
+        let mut extract = remove_word(extract, "override");
         extract.push(";".parse().unwrap());
         formatted_extracts.push(extract);
     }
     formatted_extracts
+}
+
+fn write_to_specific_line(file_path: &str, line_number: usize, new_content: &str) -> std::io::Result<()> {
+    // Read the entire file
+    let content = fs::read_to_string(file_path)?;
+
+    // Split into lines and collect into a vector
+    let mut lines: Vec<&str> = content.lines().collect();
+
+    // Modify the specific line if it exists
+    if line_number < lines.len() {
+        lines[line_number] = new_content;
+    } else {
+        // Handle the case where the line number is out of bounds
+        // e.g., add error handling or append new lines
+    }
+
+    // Rejoin the lines and write back to the file
+    let new_content = lines.join("\n");
+    fs::write(file_path, new_content)
 }
 
 fn main() {
@@ -113,11 +150,12 @@ fn main() {
         "calculateStreamedPercentage",
     ];
     let extracts = extract_line(function_names, "SablierV2NFTDescriptor.sol");
-    dbg!(extracts.unwrap());
+    // dbg!(extracts.unwrap());
+    let _ = write_to_specific_line("Contract.sol", 4, extracts.unwrap().join("").as_str());
     // dbg!(format_extract(extracts.unwrap()));
 }
 // I want to be able to copy the content of the template - done
 // change ITemplate to the contract_name - done
 // extract line of function name - done
 // remove space at the beginning of the extract - done
-// fornmat extracts
+// fornmat extracts - done
