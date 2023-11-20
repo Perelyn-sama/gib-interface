@@ -1,7 +1,7 @@
 use clap::Parser;
 use gib_interface::run;
 
-/// Simple program to get an interface from a solidity contract
+/// Simple program to get a solidity interface from a solidity contract
 #[derive(Parser, Debug)]
 #[command(author, version, about, long_about = None)]
 struct Args {
