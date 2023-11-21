@@ -1,15 +1,16 @@
 use std::fs::{self, File, OpenOptions};
 use std::io::{self, BufRead, Read, Write};
 use std::process;
+// use clap::error::ContextValue::String;
 
 pub fn create_template(contract_name: Option<&str>) -> Result<(), io::Error> {
     let instance_buffer = match contract_name {
         Some(str) => File::create(format!("I{str}.sol")),
         None => File::create("instance.sol"),
     };
-    let f = File::open("template.sol");
+    let mut f = File::open("template.sol")?;
     let mut template_buffer = String::new();
-    f?.read_to_string(&mut template_buffer)?;
+    f.read_to_string(&mut template_buffer)?;
     instance_buffer?.write_all(template_buffer.as_bytes())?;
     Ok(())
 }
